@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .form-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="text"], select {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #01785e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #01634b;
+        }
+        p {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        a {
+            color: #01785e;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>회원가입</h2>
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="사용자명" required><br>
+        <input type="password" id="password" placeholder="비밀번호" required><br>
+<!--        <input type="tel" id="phone" placeholder="전화번호" pattern="[0-9]{3}-[0-9]{3,4}-[0-9]{4}" required><br>-->
+<!--        <input type="text" id="address" placeholder="주소" required><br>-->
+        <select id="role" required>
+            <option value="">고객 유형</option>
+            <option value="BUYER">구매자</option>
+            <option value="SELLER">판매자</option>
+        </select><br>
+        <button type="submit">회원가입</button>
+    </form>
+    <p>이미 계정이 있으신가요? <a href="/member/login.html">로그인</a></p>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const data = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            // phone: document.getElementById('phone').value,
+            // address: document.getElementById('address').value,
+            role: document.getElementById('role').value
+        };
+
+        fetch('http://localhost:8080/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
+                }
+            })
+            .then(result => {
+                alert('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.');
+                sessionStorage.setItem("authToken", result.jwt);
+                window.location.href = '/member/login.html';
+            })
+            .catch(error => {
+                alert('회원가입 실패: ' + error.message);
+            });
+    });
+</script>
+</body>
+</html>
