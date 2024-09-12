@@ -32,7 +32,16 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers( "/auth/**","/product/all","/product/{id}","/test").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/member/login.html",
+                                "/member/register.html",
+                                "/auth/**",
+                                "/product/all",
+                                "/product/{id}",
+                                "/test"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
