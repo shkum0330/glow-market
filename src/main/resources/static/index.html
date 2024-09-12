@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메인 페이지</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #01785e;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        .button-group {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #01785e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .product-item {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            width: 30%;
+            text-align: center;
+        }
+        .product-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .product-item h3 {
+            margin: 10px 0;
+        }
+        .product-item p {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Glow Market</h1>
+</header>
+
+<div class="container">
+
+    <!-- 버튼 그룹 -->
+    <div class="button-group">
+        <button id="loginButton">로그인</button>
+        <button id="registerButton">회원가입</button>
+        <button id="myShopButton" style="display:none;">내 가게</button>
+        <button id="myPageButton" style="display:none;">마이페이지</button>
+        <button id="logoutButton" style="display:none;">로그아웃</button>
+    </div>
+
+    <!-- 상품 목록 -->
+    <div class="product-list" id="productList">
+        <!-- 상품 아이템들 -->
+        <div class="product-item">
+            <img src="https://via.placeholder.com/100" alt="상품 이미지">
+            <h3>상품 1</h3>
+            <p>상품 설명입니다.</p>
+        </div>
+        <div class="product-item">
+            <img src="https://via.placeholder.com/100" alt="상품 이미지">
+            <h3>상품 2</h3>
+            <p>상품 설명입니다.</p>
+        </div>
+        <div class="product-item">
+            <img src="https://via.placeholder.com/100" alt="상품 이미지">
+            <h3>상품 3</h3>
+            <p>상품 설명입니다.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isLoggedIn = false;
+
+    window.onload = function () {
+        checkLoggedIn();
+    }
+
+    document.getElementById('loginButton').addEventListener('click', function() {
+        window.location.href = '/member/login.html';
+    });
+
+    document.getElementById('registerButton').addEventListener('click', function() {
+        window.location.href = '/member/register.html';
+    });
+
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        sessionStorage.removeItem("authToken");
+        checkLoggedIn();
+        alert('로그아웃 되었습니다.');
+    });
+
+    function checkLoggedIn() {
+        let token = sessionStorage.getItem("authToken");
+        if (token != null) isLoggedIn = true;
+        else isLoggedIn = false;
+
+        updateUI();
+    }
+
+    function updateUI() {
+        if (isLoggedIn) {
+            document.getElementById('loginButton').style.display = 'none';
+            document.getElementById('registerButton').style.display = 'none';
+            document.getElementById('logoutButton').style.display = 'inline-block';
+            document.getElementById('myPageButton').style.display = 'inline-block';
+            document.getElementById('myShopButton').style.display = 'inline-block';
+        } else {
+            document.getElementById('loginButton').style.display = 'inline-block';
+            document.getElementById('registerButton').style.display = 'inline-block';
+            document.getElementById('logoutButton').style.display = 'none';
+            document.getElementById('myPageButton').style.display = 'none';
+            document.getElementById('myShopButton').style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
