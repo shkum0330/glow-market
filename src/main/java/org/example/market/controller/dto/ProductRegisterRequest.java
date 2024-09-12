@@ -13,6 +13,6 @@ public class ProductRegisterRequest {
     private Long quantity;
 
     public Product toEntity(){
-        return Product.builder().name(name).price(price).seller(seller).status(status).build();
+        return Product.builder().name(name).price(price).seller(seller).status(status).stock(quantity.intValue()).build();
     }
 }
