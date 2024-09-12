@@ -57,29 +57,4 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{id}/reserve") // 예약
-    public ResponseEntity<?> reserveProduct(@PathVariable Long id, @RequestBody BuyProductRequest buyProductRequest, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new UnauthorizedException("로그인이 필요합니다.");
-        }
-        Product product=productService.findById(id).orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
-        if(product.getStock()< buyProductRequest.getQuantity()){
-            throw new InsufficientStockException("재고가 부족합니다");
-        }
-        Member buyer = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
-        productService.reserveProduct(id,buyer,buyProductRequest.getPrice(), buyProductRequest.getQuantity());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("구매할 수 없는 제품입니다.");
-    }
-
-    @PostMapping("/{id}/approve") // 판매승인
-    public ResponseEntity<?> approveSale(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new UnauthorizedException("로그인이 필요합니다.");
-        }
-        Member seller = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
-        Orders orders = orderRepository.findById(id).orElseThrow(()->new OrderNotFoundException("존재하지 않는 거래입니다."));
-        productService.approveSale(orders,seller);
-
-        return ResponseEntity.ok(new OrderCompleteResponse(id, orders.getBuyer().getId(), orders.getQuantity(), orders.getStatus()));
-    }
 }
