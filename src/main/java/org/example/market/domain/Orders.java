@@ -6,14 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-import static org.example.market.domain.Transaction.TransactionStatus.RESERVED;
+import static org.example.market.domain.Orders.OrderStatus.RESERVED;
 
 
 @Entity
-@Table(name = "TRANSACTIONS")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Transaction extends BaseTimeEntity{
+public class Orders extends BaseTimeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,17 +26,17 @@ public class Transaction extends BaseTimeEntity{
     private Member buyer;
 
     @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
+    private OrderStatus status;
 
     @Getter
-    public enum TransactionStatus {
+    public enum OrderStatus {
         RESERVED("예약중"),
         COMPLETED("완료"),
         CANCELED("취소");
 
         private final String description;
 
-        TransactionStatus(String description) {
+        OrderStatus(String description) {
             this.description = description;
         }
     }
@@ -48,7 +47,7 @@ public class Transaction extends BaseTimeEntity{
     @Column(nullable = false)
     private Long totalPrice;
 
-    public Transaction(Product product, Member buyer, Transaction.TransactionStatus status, Long quantity, Long totalPrice) {
+    public Orders(Product product, Member buyer, OrderStatus status, Long quantity, Long totalPrice) {
         this.product = product;
         this.buyer = buyer;
         this.status = status;
@@ -59,6 +58,4 @@ public class Transaction extends BaseTimeEntity{
     public void setCompleted(){
         this.status= RESERVED;
     }
-
-
 }

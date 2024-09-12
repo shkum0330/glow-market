@@ -4,12 +4,11 @@ import org.example.market.config.SecurityConfig;
 import org.example.market.domain.Member;
 import org.example.market.domain.Product;
 import org.example.market.jwt.JwtUtil;
-import org.example.market.repository.TransactionRepository;
+import org.example.market.repository.OrderRepository;
 import org.example.market.service.MemberService;
 import org.example.market.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,7 +34,7 @@ public class ProductControllerTest {
     @MockBean
     private MemberService memberService;
     @MockBean
-    private TransactionRepository transactionRepository;
+    private OrderRepository transactionRepository;
     @MockBean
     private JwtUtil jwtUtil;
 
