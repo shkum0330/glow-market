@@ -45,7 +45,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.save(productRegisterRequest.toEntity()));
     }
 
-    @GetMapping("/all")
+    @GetMapping("/all") // 제품 목록 표시, stock이 0이면 품절이라 표시
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(productService.findAll());
     }
