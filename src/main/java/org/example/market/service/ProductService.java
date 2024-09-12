@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.market.domain.Member;
 import org.example.market.domain.Product;
-import org.example.market.domain.Transaction;
+import org.example.market.domain.Orders;
 import org.example.market.exception.ProductNotFoundException;
 import org.example.market.exception.UnauthorizedException;
 import org.example.market.repository.ProductRepository;
-import org.example.market.repository.TransactionRepository;
+import org.example.market.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final TransactionRepository transactionRepository;
+    private final OrderRepository orderRepository;
 
     @Transactional
     public Product save(Product product) {
@@ -64,12 +64,12 @@ public class ProductService {
             throw new IllegalArgumentException("제시한 가격이 일치하지 않습니다.");
         }
 
-        transactionRepository.save(new Transaction(product, buyer, Transaction.TransactionStatus.RESERVED,quantity,price*quantity));
+        orderRepository.save(new Orders(product, buyer, Orders.OrderStatus.RESERVED,quantity,price*quantity));
     }
 
     @Transactional
-    public void approveSale(Transaction transaction, Member seller) {
-        Product product = productRepository.findById(transaction.getProduct().getId())
+    public void approveSale(Orders orders, Member seller) {
+        Product product = productRepository.findById(orders.getProduct().getId())
                 .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
 
         if (!product.getSeller().equals(seller)) {
@@ -80,8 +80,8 @@ public class ProductService {
             throw new IllegalStateException("판매를 승인할 수 없는 상태입니다.");
         }
 
-        if(transaction.getQuantity() == product.getStock()) product.soldOut();
+        if(orders.getQuantity() == product.getStock()) product.soldOut();
 
-        transaction.setCompleted();
+        orders.setCompleted();
     }
 }

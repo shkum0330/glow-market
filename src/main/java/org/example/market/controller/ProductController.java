@@ -4,15 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.example.market.controller.dto.BuyProductRequest;
 import org.example.market.controller.dto.ProductDetailResponse;
 import org.example.market.controller.dto.ProductRegisterRequest;
-import org.example.market.controller.dto.TransactionCompleteResponse;
+import org.example.market.controller.dto.OrderCompleteResponse;
 import org.example.market.domain.Member;
 import org.example.market.domain.Product;
-import org.example.market.domain.Transaction;
+import org.example.market.domain.Orders;
 import org.example.market.exception.InsufficientStockException;
 import org.example.market.exception.ProductNotFoundException;
-import org.example.market.exception.TransactionNotFoundException;
+import org.example.market.exception.OrderNotFoundException;
 import org.example.market.exception.UnauthorizedException;
-import org.example.market.repository.TransactionRepository;
+import org.example.market.repository.OrderRepository;
 import org.example.market.service.MemberService;
 import org.example.market.service.ProductService;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class ProductController {
 
     private final ProductService productService;
     private final MemberService memberService;
-    private final TransactionRepository transactionRepository;
+    private final OrderRepository orderRepository;
 
 
     @PostMapping("/add") // 제품 등록
@@ -77,9 +77,9 @@ public class ProductController {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
         Member seller = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
-        Transaction transaction=transactionRepository.findById(id).orElseThrow(()->new TransactionNotFoundException("존재하지 않는 거래입니다."));
-        productService.approveSale(transaction,seller);
+        Orders orders = orderRepository.findById(id).orElseThrow(()->new OrderNotFoundException("존재하지 않는 거래입니다."));
+        productService.approveSale(orders,seller);
 
-        return ResponseEntity.ok(new TransactionCompleteResponse(id,transaction.getBuyer().getId(),transaction.getQuantity(),transaction.getStatus()));
+        return ResponseEntity.ok(new OrderCompleteResponse(id, orders.getBuyer().getId(), orders.getQuantity(), orders.getStatus()));
     }
 }
