@@ -1,10 +1,7 @@
 package org.example.market.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.market.controller.dto.BuyProductRequest;
-import org.example.market.controller.dto.ProductDetailResponse;
-import org.example.market.controller.dto.ProductRegisterRequest;
-import org.example.market.controller.dto.OrderCompleteResponse;
+import org.example.market.controller.dto.*;
 import org.example.market.domain.Member;
 import org.example.market.domain.Product;
 import org.example.market.domain.Orders;
@@ -23,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/product")
@@ -34,12 +32,19 @@ public class ProductController {
     private final OrderRepository orderRepository;
 
 
-    @PostMapping("/add") // 제품 등록
+    @PostMapping("/add")
     public ResponseEntity<?> addProduct(@RequestBody ProductRegisterRequest productRegisterRequest, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
-        Member member = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+
+        Member member = memberService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+
+        if (member.getRole() != Member.Role.SELLER) {
+            throw new UnauthorizedException("판매자만 상품을 등록할 수 있습니다.");
+        }
+
         productRegisterRequest.setSeller(member);
         productRegisterRequest.setStatus(Product.ProductStatus.FOR_SALE);
         return ResponseEntity.ok(productService.save(productRegisterRequest.toEntity()));
@@ -55,6 +60,39 @@ public class ProductController {
         return productService.findById(id)
                 .map(product -> ResponseEntity.ok(new ProductDetailResponse(product)))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/seller/products")
+    public ResponseEntity<List<ProductDetailResponse>> getSellerProducts(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+        Member seller = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+        List<Product> products = productService.findBySeller(seller);
+        List<ProductDetailResponse> responses = products.stream()
+                .map(ProductDetailResponse::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responses);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest updateRequest, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+        Member seller = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+        Product updatedProduct = productService.updateProduct(id, updateRequest, seller);
+        return ResponseEntity.ok(new ProductDetailResponse(updatedProduct));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+        Member seller = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
+        productService.deleteProduct(id, seller);
+        return ResponseEntity.ok().build();
     }
 
 }

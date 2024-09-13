@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
-import static org.example.market.domain.Product.ProductStatus.*;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,11 +15,12 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="product_id")
     private Long id;
+
     private String name;
     private Long price;
 
     @Enumerated(EnumType.STRING)
-    private ProductStatus status; // "판매중", "예약중", "완료"
+    private ProductStatus status;
 
     @Getter
     public enum ProductStatus {
@@ -45,7 +44,7 @@ public class Product {
     private int stock;
 
     @Builder
-    public Product(String name, Long price, ProductStatus status, Member seller,int stock) {
+    public Product(String name, Long price, ProductStatus status, Member seller, int stock) {
         this.name = name;
         this.price = price;
         this.status = status;
@@ -53,18 +52,17 @@ public class Product {
         this.stock = stock;
     }
 
-    @Builder
-    public Product(Long id, String name, Long price, ProductStatus status, Member seller,int stock) {
-        this.id = id;
+    public void updateDetails(String name, Long price, int stock) {
         this.name = name;
         this.price = price;
-        this.status = status;
-        this.seller = seller;
-        this.stock=stock;
+        this.stock = stock;
     }
 
+    public void setStatus(ProductStatus status) {
+        this.status = status;
+    }
 
-    public void soldOut(){
-        this.status= SOLD_OUT;
+    public void soldOut() {
+        this.status = ProductStatus.SOLD_OUT;
     }
 }
