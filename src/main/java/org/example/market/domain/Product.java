@@ -52,4 +52,7 @@ public class Product {
     public void soldOut() {
         this.status = ProductStatus.SOLD_OUT;
     }
+    public void minusStock(Long stock) {
+        this.stock -= stock;
+    }
 }

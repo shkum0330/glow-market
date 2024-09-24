@@ -63,6 +63,7 @@ public class OrderService {
 
         if(orders.getQuantity() == product.getStock()) product.soldOut();
 
+        product.minusStock(orders.getQuantity());
         orders.setCompleted();
     }
 

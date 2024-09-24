@@ -45,7 +45,6 @@ public class MemberController {
         );
 
         final UserDetails userDetails = memberService.loadUserByUsername(authenticationRequest.getUsername());
-
         final String jwt = jwtUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
@@ -63,5 +62,4 @@ public class MemberController {
 
         return ResponseEntity.ok(Collections.singletonMap("role", member.getRole()));
     }
-
 }

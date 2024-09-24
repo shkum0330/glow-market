@@ -161,6 +161,8 @@
             .then(user => {
                 if (user.role === 'BUYER') {
                     document.getElementById('myShopButton').style.display = 'none';  // BUYER일 때 "내 가게" 버튼 숨김
+                } else if (user.role === 'SELLER') {
+                    document.getElementById('myPageButton').style.display = 'none';  // SELLER일 때 "마이페이지" 버튼 숨김
                 }
             })
             .catch(error => {
@@ -228,7 +230,18 @@
         `).join('');
     }
 
-    function reserveProduct(productId, price, quantity) {
+    function reserveProduct(productId, price, stock) {
+        // 수량 입력 필드에서 값을 가져옵니다.
+        const quantityInput = document.getElementById(`quantity-${productId}`);
+        const quantity = parseInt(quantityInput.value);
+
+        // 수량이 유효한지 확인합니다.
+        if (quantity < 1 || quantity > stock) {
+            alert('유효한 수량을 입력해 주세요.');
+            return;
+        }
+
+        // 주문 요청을 보냅니다.
         fetch(`/order/${productId}/reserve`, {
             method: 'POST',
             headers: {
@@ -237,7 +250,7 @@
             },
             body: JSON.stringify({
                 price: price,
-                quantity: quantity
+                quantity: quantity  // 사용자가 설정한 수량을 보냄
             })
         })
             .then(response => {
