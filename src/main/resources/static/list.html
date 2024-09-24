@@ -71,7 +71,7 @@
     const statusFilter = document.getElementById('statusFilter');
 
     function fetchProducts() {
-        fetch('/api/products')
+        fetch('/product/all')
             .then(response => response.json())
             .then(products => {
                 window.products = products;
