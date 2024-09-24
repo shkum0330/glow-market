@@ -48,7 +48,7 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+    public ResponseEntity<?> getProductById(@PathVariable("id") Long id) {
         return productService.findById(id)
                 .map(product -> ResponseEntity.ok(new ProductDetailResponse(product)))
                 .orElse(ResponseEntity.notFound().build());
@@ -68,7 +68,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest updateRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id, @RequestBody ProductUpdateRequest updateRequest, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
@@ -78,7 +78,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
