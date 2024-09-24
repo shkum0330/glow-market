@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final ProductRepository productRepository;
-    private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
 
     public Orders findById(Long id) {

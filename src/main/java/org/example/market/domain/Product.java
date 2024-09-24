@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,6 +36,7 @@ public class Product {
     @Column(nullable = false)
     @ColumnDefault("0")
     private int stock;
+
     @Builder
     public Product(String name, Long price, ProductStatus status, Member seller, int stock) {
         this.name = name;
