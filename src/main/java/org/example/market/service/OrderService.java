@@ -1,6 +1,7 @@
 package org.example.market.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.market.controller.dto.OrderResponse;
 import org.example.market.domain.Member;
 import org.example.market.domain.Orders;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -57,7 +59,8 @@ public class OrderService {
             throw new UnauthorizedException("판매자가 아닙니다.");
         }
 
-        if (product.getStock() < orders.getProduct().getStock()) {
+
+        if (product.getStock() < orders.getQuantity()) {
             throw new InsufficientStockException("재고가 부족합니다.");
         }
 
