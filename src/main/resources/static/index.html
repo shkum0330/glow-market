@@ -219,7 +219,7 @@
         productTableBody.innerHTML = filteredProducts.map(product => `
         <tr>
             <td>${product.name}</td>
-            <td>$${product.price.toFixed(2)}</td>
+            <td>${product.price}원</td>
             <td class="status-${product.status}">${product.status}</td>
             <td>${product.stock}</td>
             <td class="purchase-cell">
