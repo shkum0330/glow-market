@@ -123,6 +123,10 @@
         alert('로그아웃 되었습니다.');
     });
 
+    document.getElementById('myShopButton').addEventListener('click', function() {
+        window.location.href = '/sellerpage.html';
+    });
+
     function checkLoggedIn() {
         let token = sessionStorage.getItem("authToken");
         if (token != null) isLoggedIn = true;
