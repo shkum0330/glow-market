@@ -19,4 +19,10 @@ public class RegisterRequest implements Serializable {
     public Member toEntity(){
         return Member.builder().username(username).password(password).role(role).build();
     }
+
+    public RegisterRequest(String username, String password, Role role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 }

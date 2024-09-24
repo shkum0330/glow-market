@@ -237,7 +237,7 @@
 
         // 수량이 유효한지 확인합니다.
         if (quantity < 1 || quantity > stock) {
-            alert('유효한 수량을 입력해 주세요.');
+            alert('재고가 부족합니다.');
             return;
         }
 
@@ -257,15 +257,16 @@
                 if (response.ok) {
                     return response.text();  // 성공 메시지 읽기
                 } else {
-                    throw new Error('구매 요청 실패');
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);  // 에러 메시지를 throw하여 catch 블록에서 처리
+                    });
                 }
             })
             .then(message => {
                 alert('구매 요청에 성공하였습니다.');
             })
             .catch(error => {
-                console.error(error);
-                alert('구매 요청에 실패하였습니다.');
+                alert(error.message);
             });
     }
 

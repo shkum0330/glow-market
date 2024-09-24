@@ -83,7 +83,7 @@ class MarketApplicationTests {
         ProductRegisterRequest productRegisterRequest = new ProductRegisterRequest();
         productRegisterRequest.setName("Test Product");
         productRegisterRequest.setPrice(10000L);
-        productRegisterRequest.setQuantity(100L);
+        productRegisterRequest.setStock(100L);
 
         String productJson = objectMapper.writeValueAsString(productRegisterRequest);
 

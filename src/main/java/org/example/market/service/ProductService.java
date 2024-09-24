@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.market.controller.dto.ProductUpdateRequest;
 import org.example.market.domain.Member;
 import org.example.market.domain.Product;
+import org.example.market.domain.Product.ProductStatus;
 import org.example.market.exception.ProductNotFoundException;
 import org.example.market.exception.UnauthorizedException;
 import org.example.market.repository.OrderRepository;
@@ -37,7 +38,7 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public List<Product> findByStatus(Product.ProductStatus status) {
+    public List<Product> findByStatus(ProductStatus status) {
         return productRepository.findByStatus(status);
     }
 

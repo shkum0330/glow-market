@@ -30,9 +30,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void reserveProduct(Long productId, Member buyer, Long price, Long quantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("존재하지 않는 제품입니다."));
+    public void reserveProduct(Product product, Member buyer, Long price, Long quantity) {
 
         if (product.getSeller().equals(buyer)) {
             throw new UnauthorizedException("판매자가 본인의 제품을 구매할 수 없습니다.");
@@ -73,15 +71,17 @@ public class OrderService {
 
         List<Orders> orders = orderRepository.findByBuyer(member);
 
-        return orders.stream().map(order ->
-                new OrderResponse(
-                        order.getId(),
-                        order.getProduct().getName(),
-                        order.getTotalPrice(),
-                        order.getStatus(),
-                        order.getQuantity()
-                )
-        ).collect(Collectors.toList());
+        return orders.stream().map(order -> {
+            Product product = order.getProduct();
+            String productName = (product != null) ? product.getName() : "존재하지 않는 상품";
+            return new OrderResponse(
+                    order.getId(),
+                    productName,
+                    order.getTotalPrice(),
+                    order.getStatus(),
+                    order.getQuantity()
+            );
+        }).collect(Collectors.toList());
     }
 
     public List<OrderResponse> getOrdersByProduct(Product product) {

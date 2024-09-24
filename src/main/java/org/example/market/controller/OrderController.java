@@ -8,6 +8,7 @@ import org.example.market.controller.dto.OrderCompleteResponse;
 import org.example.market.domain.Member;
 import org.example.market.domain.Orders;
 import org.example.market.domain.Product;
+import org.example.market.exception.InsufficientStockException;
 import org.example.market.exception.ProductNotFoundException;
 import org.example.market.exception.UnauthorizedException;
 import org.example.market.service.MemberService;
@@ -31,18 +32,20 @@ public class OrderController {
 
     @PostMapping("/{id}/reserve") // 예약
     public ResponseEntity<?> reserveProduct(@PathVariable("id") Long id, @RequestBody BuyProductRequest buyProductRequest, @AuthenticationPrincipal UserDetails userDetails) {
-        log.info("userdetail: {}", userDetails);
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
         Product product=productService.findById(id).orElseThrow(() -> new ProductNotFoundException("존재하지 않는 상품입니다."));
-        if(product.getStock()< buyProductRequest.getQuantity()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("재고보다 많은 수량을 주문할 수 없습니다.");
-        }
         Member buyer = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
-        orderService.reserveProduct(id,buyer,buyProductRequest.getPrice(), buyProductRequest.getQuantity());
+        try {
+            orderService.reserveProduct(product, buyer, buyProductRequest.getPrice(), buyProductRequest.getQuantity());
+            return ResponseEntity.ok("구매 요청에 성공하였습니다.");
+        } catch (UnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
 
-        return ResponseEntity.ok("구매 요청에 성공하였습니다.");
     }
 
     @PostMapping("/{id}/approve") // 판매승인
@@ -52,9 +55,13 @@ public class OrderController {
         }
         Member seller = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
         Orders order = orderService.findById(id);
-        orderService.approveSale(order,seller);
 
-        return ResponseEntity.ok(new OrderCompleteResponse(id, order.getBuyer().getId(), order.getQuantity(), order.getStatus()));
+        try {
+            orderService.approveSale(order, seller);
+            return ResponseEntity.ok(new OrderCompleteResponse(id, order.getBuyer().getId(), order.getQuantity(), order.getStatus()));
+        } catch (InsufficientStockException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());  // 재고 부족 시 409 상태와 메시지 반환
+        }
     }
 
     @GetMapping("/buyer-list")

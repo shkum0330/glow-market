@@ -162,7 +162,7 @@
   }
 
   function fetchOrdersByProduct(productId) {
-    fetch(`order/seller-list/${productId}`, {
+    fetch(`/order/seller-list/${productId}`, {
       method: 'GET',
       headers: {
         'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
@@ -176,13 +176,13 @@
               orderList.innerHTML = ''; // 기존 목록 초기화
               orders.forEach(order => {
                 const row = `
-          <tr>
-              <td>${order.id}</td>
-              <td>${order.price}원</td>
-              <td>${order.quantity}</td>
-              <td><button onclick="approveOrder(${order.id})">판매승인</button></td>
-          </tr>
-        `;
+                <tr id="order-row-${order.id}">
+                    <td>${order.id}</td>
+                    <td>${order.price}원</td>
+                    <td>${order.quantity}</td>
+                    <td><button onclick="approveOrder(${order.id}, ${productId}, ${order.quantity})">판매승인</button></td>
+                </tr>
+            `;
                 orderList.innerHTML += row;
               });
 
@@ -190,7 +190,7 @@
             })
             .catch(error => console.error('Error:', error));
   }
-  function approveOrder(orderId) {
+  function approveOrder(orderId, productId, quantity) {
     fetch(`/order/${orderId}/approve`, {  // 판매승인 API 호출
       method: 'POST',
       headers: {
@@ -201,17 +201,34 @@
               if (response.ok) {
                 return response.json();
               } else {
-                throw new Error('판매승인 실패');
+                return response.text().then(errorMessage => {
+                  throw new Error(errorMessage);  // 서버에서 반환된 에러 메시지를 전달
+                });
               }
             })
             .then(data => {
               alert(`주문 ${orderId}이(가) 승인되었습니다.`);
-              fetchOrdersByProduct(selectedProductId); // 승인 후 목록 갱신
+
+              // 승인된 주문을 목록에서 제거
+              const orderRow = document.getElementById(`order-row-${orderId}`);
+              if (orderRow) {
+                orderRow.remove();  // 해당 주문 행 삭제
+              }
+
+              // 클라이언트에서 상품 재고 수량 감소 처리
+              const productStockElement = document.getElementById(`product-stock-${productId}`);
+              if (productStockElement) {
+                const currentStock = parseInt(productStockElement.innerText);
+                const newStock = currentStock - quantity;  // 재고 감소
+                productStockElement.innerText = newStock > 0 ? newStock : 0;  // 재고가 0 미만일 경우 0으로 설정
+              }
             })
             .catch(error => {
               console.error('Error:', error);
+              alert(error.message);  // 에러 메시지 출력
             });
   }
+
   document.getElementById('addProductForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const product = {
