@@ -37,31 +37,26 @@
         button:hover {
             background-color: #0056b3;
         }
-        .product-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
+        /* Table-based product list */
+        .filters {
+            margin-bottom: 20px;
         }
-        .product-item {
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
-            width: 30%;
-            text-align: center;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .product-item img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            margin-bottom: 10px;
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
         }
-        .product-item h3 {
-            margin: 10px 0;
+        th {
+            background-color: #f4f4f4;
+            cursor: pointer;
         }
-        .product-item p {
-            color: #555;
-        }
+        .status-FOR_SALE { color: green; }
+        .status-RESERVED { color: orange; }
+        .status-SOLD_OUT { color: red; }
     </style>
 </head>
 <body>
@@ -82,23 +77,29 @@
     </div>
 
     <!-- 상품 목록 -->
-    <div class="product-list" id="productList">
-        <!-- 상품 아이템들 -->
-        <div class="product-item">
-            <img src="https://via.placeholder.com/100" alt="상품 이미지">
-            <h3>상품 1</h3>
-            <p>상품 설명입니다.</p>
+    <div>
+        <h1>상품 목록</h1>
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="Search products...">
+            <select id="statusFilter">
+                <option value="all">All Statuses</option>
+                <option value="FOR_SALE">For Sale</option>
+                <option value="RESERVED">Reserved</option>
+                <option value="SOLD_OUT">Sold Out</option>
+            </select>
         </div>
-        <div class="product-item">
-            <img src="https://via.placeholder.com/100" alt="상품 이미지">
-            <h3>상품 2</h3>
-            <p>상품 설명입니다.</p>
-        </div>
-        <div class="product-item">
-            <img src="https://via.placeholder.com/100" alt="상품 이미지">
-            <h3>상품 3</h3>
-            <p>상품 설명입니다.</p>
-        </div>
+        <table id="productTable">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)">Name</th>
+                <th onclick="sortTable(1)">Price</th>
+                <th onclick="sortTable(2)">Status</th>
+                <th onclick="sortTable(3)">Stock</th>
+            </tr>
+            </thead>
+            <tbody id="productTableBody">
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -107,6 +108,7 @@
 
     window.onload = function () {
         checkLoggedIn();
+        fetchProducts();
     }
 
     document.getElementById('loginButton').addEventListener('click', function() {
@@ -129,9 +131,7 @@
 
     function checkLoggedIn() {
         let token = sessionStorage.getItem("authToken");
-        if (token != null) isLoggedIn = true;
-        else isLoggedIn = false;
-
+        isLoggedIn = token != null;
         updateUI();
     }
 
@@ -150,6 +150,85 @@
             document.getElementById('myShopButton').style.display = 'none';
         }
     }
+
+    // Product fetching and filtering
+    const productTableBody = document.getElementById('productTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+
+    function fetchProducts() {
+        fetch('/product/all')
+            .then(response => response.json())
+            .then(products => {
+                window.products = products;
+                renderProducts();
+            })
+            .catch(error => console.error('Error fetching products:', error));
+    }
+
+    function renderProducts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusFilterValue = statusFilter.value;
+
+        const filteredProducts = window.products.filter(product =>
+            product.name.toLowerCase().includes(searchTerm) &&
+            (statusFilterValue === 'all' || product.status === statusFilterValue)
+        );
+
+        productTableBody.innerHTML = filteredProducts.map(product => `
+            <tr>
+                <td>${product.name}</td>
+                <td>$${product.price.toFixed(2)}</td>
+                <td class="status-${product.status}">${product.status}</td>
+                <td>${product.stock}</td>
+            </tr>
+        `).join('');
+    }
+
+    function sortTable(n) {
+        const table = document.getElementById("productTable");
+        let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        switching = true;
+        dir = "asc";
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchcount++;
+            } else {
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+    }
+
+    searchInput.addEventListener('input', renderProducts);
+    statusFilter.addEventListener('change', renderProducts);
+
 </script>
 
 </body>
