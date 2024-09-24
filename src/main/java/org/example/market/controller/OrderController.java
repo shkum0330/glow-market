@@ -30,7 +30,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/{id}/reserve") // 예약
-    public ResponseEntity<?> reserveProduct(@PathVariable Long id, @RequestBody BuyProductRequest buyProductRequest, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> reserveProduct(@PathVariable("id") Long id, @RequestBody BuyProductRequest buyProductRequest, @AuthenticationPrincipal UserDetails userDetails) {
         log.info("userdetail: {}", userDetails);
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
@@ -46,7 +46,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/approve") // 판매승인
-    public ResponseEntity<?> approveSale(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> approveSale(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
@@ -68,7 +68,7 @@ public class OrderController {
     }
 
     @GetMapping("/seller-list/{productId}")
-    public ResponseEntity<?> getOrderByProduct(@PathVariable Long productId,@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> getOrderByProduct(@PathVariable("productId") Long productId,@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
