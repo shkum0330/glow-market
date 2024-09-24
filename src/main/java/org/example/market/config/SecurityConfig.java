@@ -40,7 +40,9 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/product/all",
                                 "/product/{id}",
-                                "/test"
+                                "/test",
+                                "/list.html",
+                                "/sellerpage.html"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

@@ -117,7 +117,12 @@
 </div>
 <script>
   function fetchProducts() {
-    fetch('/product/seller/products')
+    fetch('/product/seller/products', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
+      }
+    })
             .then(response => response.json())
             .then(products => {
               const productList = document.getElementById('productList');
@@ -152,6 +157,7 @@
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
       },
       body: JSON.stringify(product),
     })
@@ -166,7 +172,11 @@
             });
   });
   function editProduct(id) {
-    fetch(`/product/${id}`)
+    fetch(`/product/${id}`, {
+      headers: {
+        'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
+      }
+    })
             .then(response => response.json())
             .then(product => {
               document.getElementById('editId').value = product.id;
@@ -191,6 +201,7 @@
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
       },
       body: JSON.stringify(product),
     })
@@ -209,6 +220,9 @@
     if (confirm('정말로 이 상품을 삭제하시겠습니까?')) {
       fetch(`/product/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
+        }
       })
               .then(response => {
                 if (response.ok) {
