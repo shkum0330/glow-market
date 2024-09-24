@@ -34,15 +34,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
-                                "/index.html",
-                                "/member/login.html",
-                                "/member/register.html",
+                                "/*.html",
                                 "/auth/**",
                                 "/product/all",
                                 "/product/{id}",
-                                "/test",
-                                "/list.html",
-                                "/sellerpage.html"
+                                "/test"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

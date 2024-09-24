@@ -54,6 +54,16 @@
             background-color: #f4f4f4;
             cursor: pointer;
         }
+        .purchase-button {
+            padding: 5px 10px;  /* Smaller padding for the button */
+            font-size: 12px;    /* Smaller font size */
+        }
+
+        /* Set a smaller width for the table cell containing the purchase button */
+        td.purchase-cell {
+            width: 80px;  /* Adjust the width as needed */
+            text-align: center;
+        }
         .status-FOR_SALE { color: green; }
         .status-RESERVED { color: orange; }
         .status-SOLD_OUT { color: red; }
@@ -119,6 +129,10 @@
         window.location.href = '/member/register.html';
     });
 
+    document.getElementById('myPageButton').addEventListener('click', function() {
+        window.location.href = '/buyer-mypage.html';
+    });
+
     document.getElementById('logoutButton').addEventListener('click', function() {
         sessionStorage.removeItem("authToken");
         checkLoggedIn();
@@ -176,13 +190,45 @@
         );
 
         productTableBody.innerHTML = filteredProducts.map(product => `
-            <tr>
-                <td>${product.name}</td>
-                <td>$${product.price.toFixed(2)}</td>
-                <td class="status-${product.status}">${product.status}</td>
-                <td>${product.stock}</td>
-            </tr>
+        <tr>
+            <td>${product.name}</td>
+            <td>$${product.price.toFixed(2)}</td>
+            <td class="status-${product.status}">${product.status}</td>
+            <td>${product.stock}</td>
+            <td class="purchase-cell">
+                <input type="number" id="quantity-${product.id}" min="1" max="${product.stock}" value="1" style="width: 50px;">
+                <button class="purchase-button" onclick="reserveProduct(${product.id}, ${product.price}, ${product.stock})">구매</button>
+            </td>
+        </tr>
         `).join('');
+    }
+
+    function reserveProduct(productId, price, quantity) {
+        fetch(`/order/${productId}/reserve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`  // 토큰을 통한 인증
+            },
+            body: JSON.stringify({
+                price: price,
+                quantity: quantity
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();  // 성공 메시지 읽기
+                } else {
+                    throw new Error('구매 요청 실패');
+                }
+            })
+            .then(message => {
+                alert('구매 요청에 성공하였습니다.');
+            })
+            .catch(error => {
+                console.error(error);
+                alert('구매 요청에 실패하였습니다.');
+            });
     }
 
     function sortTable(n) {

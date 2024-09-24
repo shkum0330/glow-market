@@ -130,3 +130,6 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
+
+# Ignore application configuration files
+application.yml

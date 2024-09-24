@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #01785e;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My Orders</h1>
+</header>
+
+<div class="container">
+    <table id="orderTable">
+        <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody id="orderTableBody">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    window.onload = function () {
+        fetchOrders();
+    }
+
+    function fetchOrders() {
+        fetch('/order/list', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`  // 인증 토큰 사용
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to fetch orders');
+                }
+            })
+            .then(orders => {
+                renderOrders(orders);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('구매 내역을 불러오지 못했습니다.');
+            });
+    }
+
+    function renderOrders(orders) {
+        const orderTableBody = document.getElementById('orderTableBody');
+        orderTableBody.innerHTML = orders.map(order => `
+            <tr>
+                <td>${order.productName}</td>
+                <td>$${order.price}</td>
+                <td>${order.quantity}</td>
+                <td>${order.status}</td>
+            </tr>
+        `).join('');
+    }
+</script>
+
+</body>
+</html>

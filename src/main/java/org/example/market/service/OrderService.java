@@ -1,24 +1,30 @@
 package org.example.market.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.market.controller.dto.OrderResponse;
 import org.example.market.domain.Member;
 import org.example.market.domain.Orders;
 import org.example.market.domain.Product;
 import org.example.market.exception.OrderNotFoundException;
 import org.example.market.exception.ProductNotFoundException;
 import org.example.market.exception.UnauthorizedException;
+import org.example.market.exception.UsernameNotFoundException;
+import org.example.market.repository.MemberRepository;
 import org.example.market.repository.OrderRepository;
 import org.example.market.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final ProductRepository productRepository;
+    private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
 
     public Orders findById(Long id) {
@@ -61,5 +67,20 @@ public class OrderService {
         if(orders.getQuantity() == product.getStock()) product.soldOut();
 
         orders.setCompleted();
+    }
+
+    public List<OrderResponse> getOrdersByMember(Member member) {
+
+        List<Orders> orders = orderRepository.findByBuyer(member);
+
+        return orders.stream().map(order ->
+                new OrderResponse(
+                        order.getId(),
+                        order.getProduct().getName(),
+                        order.getTotalPrice(),
+                        order.getStatus(),
+                        order.getQuantity()
+                )
+        ).collect(Collectors.toList());
     }
 }

@@ -1,149 +1,149 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상품 목록</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-        }
-        .filters {
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-            cursor: pointer;
-        }
-        .status-FOR_SALE { color: green; }
-        .status-RESERVED { color: orange; }
-        .status-SOLD_OUT { color: red; }
-    </style>
-</head>
-<body>
-<div class="container">
-    <h1>상품 목록</h1>
-    <div class="filters">
-        <input type="text" id="searchInput" placeholder="Search products...">
-        <select id="statusFilter">
-            <option value="all">All Statuses</option>
-            <option value="FOR_SALE">For Sale</option>
-            <option value="RESERVED">Reserved</option>
-            <option value="SOLD_OUT">Sold Out</option>
-        </select>
-    </div>
-    <table id="productTable">
-        <thead>
-        <tr>
-            <th onclick="sortTable(0)">Name</th>
-            <th onclick="sortTable(1)">Price</th>
-            <th onclick="sortTable(2)">Status</th>
-            <th onclick="sortTable(3)">Stock</th>
-        </tr>
-        </thead>
-        <tbody id="productTableBody">
-        </tbody>
-    </table>
-</div>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>상품 목록</title>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            line-height: 1.6;-->
+<!--            margin: 0;-->
+<!--            padding: 20px;-->
+<!--        }-->
+<!--        .container {-->
+<!--            max-width: 800px;-->
+<!--            margin: 0 auto;-->
+<!--        }-->
+<!--        h1 {-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        .filters {-->
+<!--            margin-bottom: 20px;-->
+<!--        }-->
+<!--        table {-->
+<!--            width: 100%;-->
+<!--            border-collapse: collapse;-->
+<!--        }-->
+<!--        th, td {-->
+<!--            padding: 10px;-->
+<!--            border: 1px solid #ddd;-->
+<!--            text-align: left;-->
+<!--        }-->
+<!--        th {-->
+<!--            background-color: #f4f4f4;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--        .status-FOR_SALE { color: green; }-->
+<!--        .status-RESERVED { color: orange; }-->
+<!--        .status-SOLD_OUT { color: red; }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <h1>상품 목록</h1>-->
+<!--    <div class="filters">-->
+<!--        <input type="text" id="searchInput" placeholder="Search products...">-->
+<!--        <select id="statusFilter">-->
+<!--            <option value="all">All Statuses</option>-->
+<!--            <option value="FOR_SALE">For Sale</option>-->
+<!--            <option value="RESERVED">Reserved</option>-->
+<!--            <option value="SOLD_OUT">Sold Out</option>-->
+<!--        </select>-->
+<!--    </div>-->
+<!--    <table id="productTable">-->
+<!--        <thead>-->
+<!--        <tr>-->
+<!--            <th onclick="sortTable(0)">Name</th>-->
+<!--            <th onclick="sortTable(1)">Price</th>-->
+<!--            <th onclick="sortTable(2)">Status</th>-->
+<!--            <th onclick="sortTable(3)">Stock</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody id="productTableBody">-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--</div>-->
 
-<script>
-    const productTableBody = document.getElementById('productTableBody');
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
+<!--<script>-->
+<!--    const productTableBody = document.getElementById('productTableBody');-->
+<!--    const searchInput = document.getElementById('searchInput');-->
+<!--    const statusFilter = document.getElementById('statusFilter');-->
 
-    function fetchProducts() {
-        fetch('/api/products')
-            .then(response => response.json())
-            .then(products => {
-                window.products = products;
-                renderProducts();
-            })
-            .catch(error => console.error('Error fetching products:', error));
-    }
+<!--    function fetchProducts() {-->
+<!--        fetch('/product/all')-->
+<!--            .then(response => response.json())-->
+<!--            .then(products => {-->
+<!--                window.products = products;-->
+<!--                renderProducts();-->
+<!--            })-->
+<!--            .catch(error => console.error('Error fetching products:', error));-->
+<!--    }-->
 
-    function renderProducts() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const statusFilterValue = statusFilter.value;
+<!--    function renderProducts() {-->
+<!--        const searchTerm = searchInput.value.toLowerCase();-->
+<!--        const statusFilterValue = statusFilter.value;-->
 
-        const filteredProducts = window.products.filter(product =>
-            product.name.toLowerCase().includes(searchTerm) &&
-            (statusFilterValue === 'all' || product.status === statusFilterValue)
-        );
+<!--        const filteredProducts = window.products.filter(product =>-->
+<!--            product.name.toLowerCase().includes(searchTerm) &&-->
+<!--            (statusFilterValue === 'all' || product.status === statusFilterValue)-->
+<!--        );-->
 
-        productTableBody.innerHTML = filteredProducts.map(product => `
-                <tr>
-                    <td>${product.name}</td>
-                    <td>$${product.price.toFixed(2)}</td>
-                    <td class="status-${product.status}">${product.status}</td>
-                    <td>${product.stock}</td>
-                </tr>
-            `).join('');
-    }
+<!--        productTableBody.innerHTML = filteredProducts.map(product => `-->
+<!--                <tr>-->
+<!--                    <td>${product.name}</td>-->
+<!--                    <td>$${product.price.toFixed(2)}</td>-->
+<!--                    <td class="status-${product.status}">${product.status}</td>-->
+<!--                    <td>${product.stock}</td>-->
+<!--                </tr>-->
+<!--            `).join('');-->
+<!--    }-->
 
-    function sortTable(n) {
-        const table = document.getElementById("productTable");
-        let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-        switching = true;
-        dir = "asc";
+<!--    function sortTable(n) {-->
+<!--        const table = document.getElementById("productTable");-->
+<!--        let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;-->
+<!--        switching = true;-->
+<!--        dir = "asc";-->
 
-        while (switching) {
-            switching = false;
-            rows = table.rows;
+<!--        while (switching) {-->
+<!--            switching = false;-->
+<!--            rows = table.rows;-->
 
-            for (i = 1; i < (rows.length - 1); i++) {
-                shouldSwitch = false;
-                x = rows[i].getElementsByTagName("TD")[n];
-                y = rows[i + 1].getElementsByTagName("TD")[n];
+<!--            for (i = 1; i < (rows.length - 1); i++) {-->
+<!--                shouldSwitch = false;-->
+<!--                x = rows[i].getElementsByTagName("TD")[n];-->
+<!--                y = rows[i + 1].getElementsByTagName("TD")[n];-->
 
-                if (dir == "asc") {
-                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                } else if (dir == "desc") {
-                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                        shouldSwitch = true;
-                        break;
-                    }
-                }
-            }
+<!--                if (dir == "asc") {-->
+<!--                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {-->
+<!--                        shouldSwitch = true;-->
+<!--                        break;-->
+<!--                    }-->
+<!--                } else if (dir == "desc") {-->
+<!--                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {-->
+<!--                        shouldSwitch = true;-->
+<!--                        break;-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
 
-            if (shouldSwitch) {
-                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                switching = true;
-                switchcount++;
-            } else {
-                if (switchcount == 0 && dir == "asc") {
-                    dir = "desc";
-                    switching = true;
-                }
-            }
-        }
-    }
+<!--            if (shouldSwitch) {-->
+<!--                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);-->
+<!--                switching = true;-->
+<!--                switchcount++;-->
+<!--            } else {-->
+<!--                if (switchcount == 0 && dir == "asc") {-->
+<!--                    dir = "desc";-->
+<!--                    switching = true;-->
+<!--                }-->
+<!--            }-->
+<!--        }-->
+<!--    }-->
 
-    searchInput.addEventListener('input', renderProducts);
-    statusFilter.addEventListener('change', renderProducts);
+<!--    searchInput.addEventListener('input', renderProducts);-->
+<!--    statusFilter.addEventListener('change', renderProducts);-->
 
-    fetchProducts();
-</script>
-</body>
-</html>
+<!--    fetchProducts();-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

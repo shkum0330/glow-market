@@ -3,10 +3,10 @@ spring:
     name: market
 
   datasource:
-    url: jdbc:h2:tcp://localhost/~/market
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:mysql://localhost:3306/market
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
@@ -14,7 +14,6 @@ spring:
     properties:
       hibernate:
         naming:
-          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         # show_sql: true
         format_sql: true
         default_batch_fetch_size: 1000
