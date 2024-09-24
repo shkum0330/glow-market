@@ -78,6 +78,19 @@
   </thead>
   <tbody id="productList"></tbody>
 </table>
+
+<h2>주문 목록</h2>
+<table id="orderTable" style="display:none;">
+  <thead>
+  <tr>
+    <th>주문 번호</th>
+    <th>총 가격</th>
+    <th>수량</th>
+  </tr>
+  </thead>
+  <tbody id="orderList"></tbody>
+</table>
+
 <div id="addProductModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
@@ -93,6 +106,7 @@
     </form>
   </div>
 </div>
+
 <div id="editProductModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
@@ -137,6 +151,7 @@
                                 <td>
                                     <button onclick="editProduct(${product.id})">수정</button>
                                     <button onclick="deleteProduct(${product.id})">삭제</button>
+                                    <button onclick="fetchOrdersByProduct(${product.id})">주문 목록</button>
                                 </td>
                             </tr>
                         `;
@@ -144,6 +159,59 @@
               });
             })
             .catch(error => console.error('Error:', error));
+  }
+
+  function fetchOrdersByProduct(productId) {
+    fetch(`order/seller-list/${productId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
+      }
+    })
+            .then(response => response.json())
+            .then(orders => {
+              const orderTable = document.getElementById('orderTable');
+              const orderList = document.getElementById('orderList');
+
+              orderList.innerHTML = ''; // 기존 목록 초기화
+              orders.forEach(order => {
+                const row = `
+          <tr>
+              <td>${order.id}</td>
+              <td>${order.totalPrice}</td>
+              <td>${order.quantity}</td>
+              <td><button onclick="approveOrder(${order.id})">판매승인</button></td>
+          </tr>
+        `;
+                orderList.innerHTML += row;
+              });
+
+              orderTable.style.display = 'table'; // 주문 목록 테이블 표시
+            })
+            .catch(error => console.error('Error:', error));
+  }
+  function approveOrder(orderId) {
+    fetch(`/order/${orderId}/approve`, {  // 판매승인 API 호출
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + sessionStorage.getItem('authToken')
+      }
+    })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('판매승인 실패');
+              }
+            })
+            .then(data => {
+              alert(`주문 ${orderId}이(가) 승인되었습니다.`);
+              fetchOrdersByProduct(selectedProductId); // 승인 후 목록 갱신
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('판매승인에 실패했습니다.');
+            });
   }
   document.getElementById('addProductForm').addEventListener('submit', function(e) {
     e.preventDefault();

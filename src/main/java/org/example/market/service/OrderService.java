@@ -5,10 +5,7 @@ import org.example.market.controller.dto.OrderResponse;
 import org.example.market.domain.Member;
 import org.example.market.domain.Orders;
 import org.example.market.domain.Product;
-import org.example.market.exception.OrderNotFoundException;
-import org.example.market.exception.ProductNotFoundException;
-import org.example.market.exception.UnauthorizedException;
-import org.example.market.exception.UsernameNotFoundException;
+import org.example.market.exception.*;
 import org.example.market.repository.MemberRepository;
 import org.example.market.repository.OrderRepository;
 import org.example.market.repository.ProductRepository;
@@ -60,8 +57,8 @@ public class OrderService {
             throw new UnauthorizedException("판매자가 아닙니다.");
         }
 
-        if (product.getStatus() != Product.ProductStatus.RESERVED) {
-            throw new IllegalStateException("판매를 승인할 수 없는 상태입니다.");
+        if (product.getStock() < orders.getProduct().getStock()) {
+            throw new InsufficientStockException("재고가 부족합니다.");
         }
 
         if(orders.getQuantity() == product.getStock()) product.soldOut();
@@ -79,6 +76,17 @@ public class OrderService {
                         order.getProduct().getName(),
                         order.getTotalPrice(),
                         order.getStatus(),
+                        order.getQuantity()
+                )
+        ).collect(Collectors.toList());
+    }
+
+    public List<OrderResponse> getOrdersByProduct(Product product) {
+        List<Orders> orders = orderRepository.findByProduct(product);
+        return orders.stream().map(order ->
+                new OrderResponse(
+                        order.getId(),
+                        order.getTotalPrice(),
                         order.getQuantity()
                 )
         ).collect(Collectors.toList());

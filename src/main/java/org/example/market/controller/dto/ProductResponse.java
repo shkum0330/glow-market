@@ -12,8 +12,4 @@ public class ProductResponse {
     private Long price;
     private ProductStatus status;
     private int stock;
-
-    public ProductResponse(Product product) {
-
-    }
 }

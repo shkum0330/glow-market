@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+import static org.example.market.domain.Orders.OrderStatus.COMPLETED;
 import static org.example.market.domain.Orders.OrderStatus.RESERVED;
 
 
@@ -56,6 +57,6 @@ public class Orders extends BaseTimeEntity{
     }
 
     public void setCompleted(){
-        this.status= RESERVED;
+        this.status= COMPLETED;
     }
 }

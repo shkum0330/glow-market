@@ -5,11 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.market.controller.dto.BuyProductRequest;
 import org.example.market.controller.dto.OrderCompleteResponse;
-import org.example.market.controller.dto.OrderResponse;
 import org.example.market.domain.Member;
 import org.example.market.domain.Orders;
 import org.example.market.domain.Product;
-import org.example.market.exception.InsufficientStockException;
 import org.example.market.exception.ProductNotFoundException;
 import org.example.market.exception.UnauthorizedException;
 import org.example.market.service.MemberService;
@@ -21,9 +19,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -62,13 +57,22 @@ public class OrderController {
         return ResponseEntity.ok(new OrderCompleteResponse(id, order.getBuyer().getId(), order.getQuantity(), order.getStatus()));
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<?> getOrder(@AuthenticationPrincipal UserDetails userDetails) {
+    @GetMapping("/buyer-list")
+    public ResponseEntity<?> getOrderByMember(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");
         }
         Member buyer = memberService.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 회원입니다."));
 
         return ResponseEntity.ok(orderService.getOrdersByMember(buyer));
+    }
+
+    @GetMapping("/seller-list/{productId}")
+    public ResponseEntity<?> getOrderByProduct(@PathVariable Long productId,@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new UnauthorizedException("로그인이 필요합니다.");
+        }
+        Product product=productService.findById(productId).orElseThrow(()->new ProductNotFoundException("존재하지 않는 상품입니다."));
+        return ResponseEntity.ok(orderService.getOrdersByProduct(product));
     }
 }

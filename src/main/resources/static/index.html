@@ -119,6 +119,7 @@
     window.onload = function () {
         checkLoggedIn();
         fetchProducts();
+        fetchUserRole();
     }
 
     document.getElementById('loginButton').addEventListener('click', function() {
@@ -130,7 +131,7 @@
     });
 
     document.getElementById('myPageButton').addEventListener('click', function() {
-        window.location.href = '/buyer-mypage.html';
+        window.location.href = '/mypage.html';
     });
 
     document.getElementById('logoutButton').addEventListener('click', function() {
@@ -142,6 +143,30 @@
     document.getElementById('myShopButton').addEventListener('click', function() {
         window.location.href = '/sellerpage.html';
     });
+
+    function fetchUserRole() {
+        fetch('/auth/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`  // 인증 토큰 사용
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('사용자 정보를 불러올 수 없습니다.');
+                }
+            })
+            .then(user => {
+                if (user.role === 'BUYER') {
+                    document.getElementById('myShopButton').style.display = 'none';  // BUYER일 때 "내 가게" 버튼 숨김
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 
     function checkLoggedIn() {
         let token = sessionStorage.getItem("authToken");

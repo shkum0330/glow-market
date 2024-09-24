@@ -5,17 +5,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.market.controller.dto.AuthenticationRequest;
 import org.example.market.controller.dto.AuthenticationResponse;
 import org.example.market.controller.dto.RegisterRequest;
+import org.example.market.domain.Member;
 import org.example.market.jwt.JwtUtil;
 import org.example.market.service.MemberService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Slf4j
 @RestController
@@ -45,4 +50,18 @@ public class MemberController {
 
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
+
+    // ROLE 확인
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+        }
+
+        Member member = memberService.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자입니다."));
+
+        return ResponseEntity.ok(Collections.singletonMap("role", member.getRole()));
+    }
+
 }

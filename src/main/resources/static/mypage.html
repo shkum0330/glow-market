@@ -34,6 +34,14 @@
         th {
             background-color: #f4f4f4;
         }
+        .approve-button {
+            background-color: green;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -50,6 +58,7 @@
             <th>Price</th>
             <th>Quantity</th>
             <th>Status</th>
+            <th id="approveColumn" style="display:none;">Approval</th>  <!-- 구매승인 열 -->
         </tr>
         </thead>
         <tbody id="orderTableBody">
@@ -59,42 +68,63 @@
 
 <script>
     window.onload = function () {
+        fetchUserRole();  // 사용자 역할을 먼저 확인
         fetchOrders();
     }
 
-    function fetchOrders() {
-        fetch('/order/list', {
+    function fetchUserRole() {
+        fetch('/auth/me', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`  // 인증 토큰 사용
             }
         })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw new Error('Failed to fetch orders');
+            .then(response => response.json())
+            .then(user => {
+                if (user.role === 'SELLER') {
+                    document.getElementById('approveColumn').style.display = '';  // SELLER일 때 승인 버튼 열 표시
                 }
             })
+            .catch(error => {
+                console.error('Error fetching user role:', error);
+            });
+    }
+
+    function fetchOrders() {
+        fetch('/order/buyer-list', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('authToken')}`  // 인증 토큰 사용
+            }
+        })
+            .then(response => response.json())
             .then(orders => {
                 renderOrders(orders);
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error fetching orders:', error);
                 alert('구매 내역을 불러오지 못했습니다.');
             });
     }
 
     function renderOrders(orders) {
         const orderTableBody = document.getElementById('orderTableBody');
+        const isSeller = document.getElementById('approveColumn').style.display === '';  // 승인 버튼을 보여줄지 여부 확인
+
         orderTableBody.innerHTML = orders.map(order => `
             <tr>
                 <td>${order.productName}</td>
                 <td>$${order.price}</td>
                 <td>${order.quantity}</td>
                 <td>${order.status}</td>
+                ${isSeller ? `<td><button class="approve-button" onclick="approveOrder(${order.id})">구매승인</button></td>` : ''}
             </tr>
         `).join('');
+    }
+
+    function approveOrder(orderId) {
+        // 구매 승인 로직 추가 (예: API 요청)
+        alert(`Order ${orderId} approved.`);
     }
 </script>
 
