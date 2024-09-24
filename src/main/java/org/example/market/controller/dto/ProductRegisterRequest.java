@@ -10,9 +10,9 @@ public class ProductRegisterRequest {
     private Long price;
     private Member seller;
     private Product.ProductStatus status;
-    private Long quantity;
+    private Long stock;
 
     public Product toEntity(){
-        return Product.builder().name(name).price(price).seller(seller).status(status).stock(quantity.intValue()).build();
+        return Product.builder().name(name).price(price).seller(seller).status(status).stock(stock.intValue()).build();
     }
 }
